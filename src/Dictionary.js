@@ -1,63 +1,60 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import axios from "axios";
 import Results from "./Results";
+import "./Dictionary.css"
 
-import "./Dictionary.css";
 
-export default function Dictionary(props) {
-  let [keyword, setKeyword] = useState(props.defaultKeyword);
-  let [results, setResults] = useState(null);
-  let [loaded, setLoaded] = useState(false);
-  
+export default function Dictionary(props){
 
-  function handleDictionResponse(response) {
-    setResults(response.data[0]);
+    let [keyword, setKeyword] = useState(props.defaultKeyword);
+    let [results, setResults] = useState(null);
+    let [loaded, setLoaded] = useState(false);
+
+
+    function handleResponse(response){
+      console.log(response.data[0]);
+
+      setResults(response.data[0]);
+    }
+
+    function search(){
+       let apiUrl=`https://api.dictionaryapi.dev/api/v2/entries/en_US/${keyword}`
+      axios.get(apiUrl).then(handleResponse);
+    }
+
+  function handleSubmit(event){
+      event.preventDefault();
+      search();
   }
 
-  
+  function handleKeywordChange(event){
+      setKeyword(event.target.value);
 
-  function search() {
-    // documentation: https://dictionaryapi.dev/e
-    let apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en_US/${keyword}`;
-    axios.get(apiUrl).then(handleDictionResponse);
-
-   
-  function handleSubmit(event) {
-    event.preventDefault();
-    search();
   }
-
-  function handleKeywordChange(event) {
-    setKeyword(event.target.value);
-  }
-
-  function load() {
+  function load(){
     setLoaded(true);
     search();
   }
 
-  if (loaded) {
-    return (
-      <div className="Dictionary">
-        <section>
+  if (loaded){
+     return(
+        <div className="Dictionary">
+           <section> 
           <h1>What word do you want to look up?</h1>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="search"
-              onChange={handleKeywordChange}
-              defaultValue={props.defaultKeyword}
-            />
-          </form>
-          <div className="hint">
-            suggested words: sunset, wine, yoga, plant...
-          </div>
-        </section>
-        <Results results={results} />
-        
-      </div>
+          <form className="search-form" onSubmit={handleSubmit}>
+              <input placeholder="Search for a word" type="Search" onChange={handleKeywordChange} defaultValue={props.defaultKeyword}/>
+             </form> 
+             <div className="hint">
+               words you have search: verb, twilight, semidarkness, npm, animation....
+             </div>
+             </section>
+             <Results results={results}/>
+            
+        </div>
     );
-  } else {
+  }else{
     load();
-    return "Loading";
+    return "Loading...";
   }
-  }}
+   
+}
